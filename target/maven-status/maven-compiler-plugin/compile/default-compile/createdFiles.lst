@@ -1,0 +1,10 @@
+testproject\dto\dao\impl\ECartDaoImpl.class
+testproject\configuration\WebAppInitializer.class
+testproject\configuration\HibernateConfiguration.class
+testproject\projectutls\ErrorMessages.class
+testproject\service\ECartService.class
+testproject\configuration\WebApplicationConfig.class
+testproject\dto\dao\ECartDao.class
+testproject\controller\MainController.class
+testproject\dto\entity\ProductList.class
+testproject\service\impl\ECartServiceImpl.class

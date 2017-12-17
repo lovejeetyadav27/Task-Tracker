@@ -1,0 +1,52 @@
+/* Custom Stylesheet */
+
+
+/**
+ * Use this file to override Materialize files so you can update
+ * the core Materialize files in the future
+ *
+ * Made By MaterializeCSS.com
+ */
+
+.icon-block {
+    padding: 0 15px;
+}
+
+.icon-block .material-icons {
+    font-size: inherit;
+}
+
+.inactive {
+    display: none;
+}
+
+
+/* .card {
+    background: -webkit-linear-gradient(left, #7986cb, #f06292);
+} */
+
+/* <style> */
+
+*{box-sizing:border-box;}
+
+.testing{width:100%;}
+
+.box{
+
+width:33%;
+
+float:left;
+
+/* border:1px solid; */
+
+text-align:center;
+
+padding:15px;
+
+}
+
+#index-banner {
+	height: 200px;
+}
+/* 
+</style> */
