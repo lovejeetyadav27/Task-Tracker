@@ -4,29 +4,32 @@
 
 <head>
  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
     <link href="assets/css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection" />
+      <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <link href="assets/css/style.css" type="text/css" rel="stylesheet" media="screen,projection" />
 </head>
 
 <body>
     <nav class="indigo lighten-1" role="navigation">
-        <div class="nav-wrapper container"><a id="logo-container" href="#" class="brand-logo">Gizbell</a>
-            <ul class="right hide-on-med-and-down">
-                <li class="cart"><a href="#"><i class="large material-icons">add_cart</i></a></li>
-            </ul>
-
-            <ul id="nav-mobile" class="side-nav">
-                <li class="cart"><a href="#"><i class="medium material-icons">add_cart</i></a></li>
-            </ul>
-            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        <div class="nav-wrapper container"><a id="logo-container" href="home" class="brand-logo">Gizbel</a>
+        
+        <form>
+        <div style="margin-left:400px;margin-right: 200px" class="input-field  blue lighten-3">
+          <input id="entertaskid" type="search" placeholder="search with taskid" required>
+          <label class="label-icon" for="search"><i class="material-icons">search</i></label>
+         
+         
+        </div>
+      </form>
+        
         </div>
     </nav>
+    
     <div class="section no-pad-bot" id="index-banner">
         <div class="container">
             <h2 class="header center pink-text">DashBoard</h2>
-           <!--  <div class="row center">
-                <h5 class="header col s12 light">YourKart is one stop online shop to meet all your needs!</h5>
-            </div> -->
+           
         </div>
     </div>
 
@@ -56,7 +59,10 @@
  <div class="form-group">
     <button type="submit" class="btn btn-primary btn-block savetask">Submit</button>
   </div>
-  </form></div></div></div>
+  </form>
+  </div>
+  </div>
+  </div>
 
 </div>
 
@@ -85,7 +91,10 @@
 
 
 
- <div id="tagtaskid">
+ <div style="width:100%" id="tagtaskid">
+ 
+
+ 
 </div>
     
     
@@ -117,6 +126,9 @@
      <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-confirm/3.3.0/jquery-confirm.min.js"></script>
     <script src="assets/js/materialize.js"></script>
     <script src="assets/js/init.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+   
 
 </body>
 

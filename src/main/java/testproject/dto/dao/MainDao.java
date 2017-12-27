@@ -27,4 +27,6 @@ public interface MainDao {
 
 	List<Login> getUsersNotWithuserId(int userid);
 
+	List<TaskCreated> getTaskById(String id, int userid);
+
 }

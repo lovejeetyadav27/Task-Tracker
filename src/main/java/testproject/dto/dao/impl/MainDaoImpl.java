@@ -15,6 +15,7 @@ import testproject.dto.dao.MainDao;
 import testproject.dto.entity.Login;
 import testproject.dto.entity.TaskCreated;
 import testproject.dto.entity.tagTask;
+import testproject.threadlocal.HibernateUtils;
 
 @Repository
 public class MainDaoImpl implements MainDao {
@@ -24,57 +25,19 @@ public class MainDaoImpl implements MainDao {
 	SessionFactory sessionFactory;
 
 	Session session = null;
-	Transaction transaction = null;
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<TaskCreated> getTasks(int userid) {
-
-		List<TaskCreated> status = null;
-		try {
-		session = sessionFactory.openSession();
-		transaction = session.beginTransaction();
-		Criteria c = session.createCriteria(TaskCreated.class)
-		   .add(Restrictions.eq("loginId", userid)) 
-		;
-
-		status = c.list();
-		if (status.size() != 0) {
-			int resp = status.get(0).getId();
-			System.out.println(resp);
-			transaction.commit();
-
-		}else{
-			transaction.commit();
-		}
-		return status;
-		}catch (Exception ex) {
-			try {
-				
-				transaction.rollback();
-			} catch (RuntimeException re) {
-				System.out.println("Couldn't roll back transaction" + re);
-			}
-			return status;
-
-		} finally {
-			if (session != null) {
-				//session.close();
-				System.out.println("session is closed.");
-		}
-	}
-		
-	}
-
 	
-
-	@SuppressWarnings("null")
+	@Autowired
+	HibernateUtils hibernateUtils;
+	
 	@Override
 	public int getUserIdIfExist(String username, String password) {
 		
+		
+		Transaction transaction=null;
+		      
 			try {
-				session = sessionFactory.openSession();
-				transaction = session.beginTransaction();
+				session = hibernateUtils.OpenSession();
+				 transaction = session.beginTransaction();
 				
 				Criteria c = session.createCriteria(Login.class)
 			            .add(Restrictions.eq("userName", username))
@@ -91,7 +54,6 @@ public class MainDaoImpl implements MainDao {
 					int id=(int) session.save(status);
 					status.setId(id);
 				}
-				
 				transaction.commit();
 				
 				return status.getId();
@@ -107,23 +69,191 @@ public class MainDaoImpl implements MainDao {
 
 			} finally {
 				if (session != null) {
-					//session.close();
-					System.out.println("session is closed.");
+//					hibernateUtils.CloseConnection();
+					System.out.println("session not closed. finally is running.");
 			}
 		}
 	}
+	
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<TaskCreated> getTasks(int userid) {
+
+		Transaction transaction=null;
+		List<TaskCreated> status = null;
+		try {
+			session = hibernateUtils.OpenSession();
+		transaction = session.beginTransaction();
+		Criteria c = session.createCriteria(TaskCreated.class)
+		   .add(Restrictions.eq("loginId", userid)) 
+		;
+
+		status = c.list();
+		transaction.commit();
+		
+		
+		return status;
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			try {
+				transaction.rollback();
+			} catch (RuntimeException re) {
+				System.out.println("Couldn�t roll back transaction" + re);
+			}
+			return status;
+
+		} finally {
+			if (session != null) {
+//				hibernateUtils.CloseConnection();
+				System.out.println("session is closed.");
+		}
+	}
+		
+	}
+	
+	
+	
+	//To search a single task with id for a user
+	
+	
+	@Override
+	public List<TaskCreated> getTaskById(String id, int userid) {
+
+		Transaction transaction=null;
+		List<TaskCreated> status = null;
+		try {
+			session = hibernateUtils.OpenSession();
+		transaction = session.beginTransaction();
+		Criteria c = session.createCriteria(TaskCreated.class)
+		   .add(Restrictions.eq("loginId", userid)) 
+		   .add(Restrictions.eq("id", Integer.parseInt(id))) 
+		;
+
+		status = c.list();
+		transaction.commit();
+		
+		
+		return status;
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			try {
+				transaction.rollback();
+			} catch (RuntimeException re) {
+				System.out.println("Couldn�t roll back transaction" + re);
+			}
+			return status;
+
+		} finally {
+			if (session != null) {
+				hibernateUtils.CloseConnection();
+				System.out.println("session is closed.");
+		}
+	}
+		
+	}
+	
+	
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<tagTask> getTaggedUserById(int userid) {
+		
+		List<tagTask> status=null;
+		Transaction transaction=null;
+		try{
+			
+			session = hibernateUtils.OpenSession();
+		transaction = session.beginTransaction();
+		Criteria c = session.createCriteria(tagTask.class)
+		   .add(Restrictions.eq("masterLoginId", userid)) 
+		;
+
+		status= c.list();
+		if (status.size() != 0) {
+			int resp = status.get(0).getId();
+			System.out.println(resp);	
+		}
+		
+		transaction.commit();
+		
+		return status;
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			try {
+				transaction.rollback();
+			} catch (RuntimeException re) {
+				System.out.println("Couldn�t roll back transaction" + re);
+			}
+			return status;
+
+		} finally {
+			if (session != null) {
+//				hibernateUtils.CloseConnection();
+				System.out.println("session is closed.");
+		}
+	}
+	}
+
+
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public String getuserNameById(Integer userLoginId) {
+		List<Login> status=null;
+		Transaction transaction=null;
+		try{
+			session = hibernateUtils.OpenSession();
+		transaction = session.beginTransaction();
+		Criteria c = session.createCriteria(Login.class)
+		   .add(Restrictions.eq("id", userLoginId)) 
+		;
+
+		status = c.list();
+		if (status.size() != 0) {
+			int resp = status.get(0).getId();
+			System.out.println(resp);
+			transaction.commit();
+			return status.get(0).getUserName();
+
+		}
+		
+			transaction.commit();
+		
+		return "";
+		}catch (Exception ex) {
+			ex.printStackTrace();
+			try {
+				transaction.rollback();
+			} catch (RuntimeException re) {
+				System.out.println("Couldn�t roll back transaction" + re);
+			}
+			return "";
+
+		} finally {
+			if (session != null) {
+//				hibernateUtils.CloseConnection();
+				System.out.println("session is closed.");
+		}
+	}
+	
+		
+	}
+
+
 
 	@Override
 	public int savetask(TaskCreated taskcreated) {
 		
+		Transaction transaction=null;
 		try {
-			session = sessionFactory.openSession();
+			session = hibernateUtils.OpenSession();
 			transaction = session.beginTransaction();
 				
 			int id=(int) session.save(taskcreated);
 				
 			
-			transaction.commit();
+				transaction.commit();
+				
 			
 			return id;
 
@@ -138,129 +268,45 @@ public class MainDaoImpl implements MainDao {
 
 		} finally {
 			if (session != null) {
-				//session.close();
+//				hibernateUtils.CloseConnection();
 				System.out.println("session is closed.");
 		}
 	}
 }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<tagTask> getTaggedUserById(int userid) {
-		
-		List<tagTask> status=null;
-		try{
-			
-		session = sessionFactory.openSession();
-		transaction = session.beginTransaction();
-		Criteria c = session.createCriteria(tagTask.class)
-		   .add(Restrictions.eq("masterLoginId", userid)) 
-		;
-
-		status= c.list();
-		if (status.size() != 0) {
-			int resp = status.get(0).getId();
-			System.out.println(resp);
-			
-
-		}else{
-			transaction.commit();
-		}
-		return status;
-		}catch (Exception ex) {
-			try {
-				
-				transaction.rollback();
-			} catch (RuntimeException re) {
-				System.out.println("Couldn't roll back transaction" + re);
-			}
-			return status;
-
-		} finally {
-			if (session != null) {
-				//session.close();
-				System.out.println("session is closed.");
-		}
-	}
-	}
-
-
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public String getuserNameById(Integer userLoginId) {
-		List<Login> status=null;
-		try{
-			session = sessionFactory.openSession();
-		transaction = session.beginTransaction();
-		Criteria c = session.createCriteria(Login.class)
-		   .add(Restrictions.eq("id", userLoginId)) 
-		;
-
-		status = c.list();
-		if (status.size() != 0) {
-			int resp = status.get(0).getId();
-			System.out.println(resp);
-			transaction.commit();
-			return status.get(0).getUserName();
-
-		}
-		return "";
-		}catch (Exception ex) {
-			try {
-				
-				transaction.rollback();
-			} catch (RuntimeException re) {
-				System.out.println("Couldn't roll back transaction" + re);
-			}
-			return "";
-
-		} finally {
-			if (session != null) {
-				//session.close();
-				System.out.println("session is closed.");
-		}
-	}
 	
-		
-	}
 
-
-
+	@SuppressWarnings("unchecked")
 	@Override
 	public List<tagTask> getTaggedJobs(int userid) {
 		
+		Transaction transaction=null;
 		List<tagTask> status=null;
 		try{
 			
-		session = sessionFactory.openSession();
+			session = hibernateUtils.OpenSession();
 		transaction = session.beginTransaction();
 		Criteria c = session.createCriteria(tagTask.class)
 		   .add(Restrictions.eq("userLoginId", userid)) 
 		;
 
 		status= c.list();
-		if (status.size() != 0) {
-			int resp = status.get(0).getId();
-			System.out.println(resp);
-			
-
-		}else{
-			transaction.commit();
-		}
+		
+		transaction.commit();
+		
 		return status;
 		}catch (Exception ex) {
+			ex.printStackTrace();
 			try {
-				
 				transaction.rollback();
 			} catch (RuntimeException re) {
-				System.out.println("Couldn't roll back transaction" + re);
+				System.out.println("Couldn�t roll back transaction" + re);
 			}
 			return status;
 
 		} finally {
 			if (session != null) {
-				//session.close();
+//				hibernateUtils.CloseConnection();
 				System.out.println("session is closed.");
 		}
 	}
@@ -271,40 +317,42 @@ public class MainDaoImpl implements MainDao {
 	@Override
 	public List<Login> getUsersNotWithuserId(int userid) {
 		
+		Transaction transaction=null;
 		List<Login> status=null;
 		try{
 			
-		session = sessionFactory.openSession();
+			session = hibernateUtils.OpenSession();
 		transaction = session.beginTransaction();
 		Criteria c = session.createCriteria(Login.class)
 		   .add(Restrictions.ne("id", userid)) 
-		;
+		; 
 
 		status= c.list();
-		if (status.size() != 0) {
+		/*if (status.size() != 0) {
 			int resp = status.get(0).getId();
 			System.out.println(resp);
-			
-
-		}else{
-			transaction.commit();
-		}
+		}*/
+		
+		transaction.commit();
 		return status;
 		}catch (Exception ex) {
+			ex.printStackTrace();
 			try {
-				
 				transaction.rollback();
 			} catch (RuntimeException re) {
-				System.out.println("Couldn't roll back transaction" + re);
+				System.out.println("Couldn�t roll back transaction" + re);
 			}
 			return status;
 
 		} finally {
 			if (session != null) {
-				//session.close();
+//				hibernateUtils.CloseConnection();
 				System.out.println("session is closed.");
 		}
 	}
 	}
+
+
+	
 
 }

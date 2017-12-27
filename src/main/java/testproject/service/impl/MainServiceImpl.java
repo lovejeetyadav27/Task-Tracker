@@ -63,6 +63,35 @@ public class MainServiceImpl implements MainService{
 		
 		return json.toString();
 	}
+	
+	
+	@Override
+	public String getTaskById(String id, int userid) {
+		
+		JSONObject json= new JSONObject();
+	
+	List<TaskCreated> listOfTask = mainDao.getTaskById(id,userid);
+	List<HashMap<String,Object>> listofobect = new LinkedList<HashMap<String,Object>>();
+	for(TaskCreated loo : listOfTask){
+	    HashMap<String,Object> object = new HashMap<String,Object>();
+	    object.put("id", loo.getId());
+	    object.put("name", loo.getTaskName());
+	    object.put("fromdate", loo.getStartDate());
+	    object.put("todate", loo.getEndDate());
+	    object.put("description", loo.getDescription());
+	    
+	    listofobect.add(object);
+		
+		
+	}
+	json.put("listofitem", listofobect);
+	json.put("status", 1);
+	
+	return json.toString();
+	
+	}
+	
+	
 
 	@Override
 	public String getTaggedUsers(int userid) {
@@ -88,7 +117,7 @@ public class MainServiceImpl implements MainService{
 		List<HashMap<String,Object>> listofusers = new LinkedList<HashMap<String,Object>>();
 		for(Login login : totalusers){
 			 HashMap<String,Object> object = new HashMap<String,Object>();
-			    object.put("taskid", login.getId());
+			    object.put("id", login.getId());
 			    
 			    object.put("name", login.getUserName());
 			    
@@ -96,9 +125,8 @@ public class MainServiceImpl implements MainService{
 		}
 		
 		
-		
 		json.put("taggedItems", listofobect);
-		json.put("taggedjobs", listofusers);
+		json.put("totalusers", listofusers);
 		json.put("status", 1);
 		
 		return json.toString();
@@ -119,14 +147,10 @@ public class MainServiceImpl implements MainService{
 		
 		int status = mainDao.savetask(taskcreated);
  		
-		return null;
+		return status+"";
 	}
 
-	@Override
-	public String getTaskById(String id, int userid) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	
 
 	@Override
 	public String getTaggedjobs(int userid) {

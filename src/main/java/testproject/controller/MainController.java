@@ -36,11 +36,13 @@ public class MainController {
 		 String password = request.getParameter("password");
 		 
 		 if(username.equals("")||password.equals("")){
-			 status=false;
+			 
+			 if(request.getSession().getAttribute("userid")==null)
+				 status=false;
+			
+		 }else{
+			 status = mainService.checkCredentials(username,password,request);
 		 }
-		 
-		 if(request.getSession().getAttribute("userid")==null)
-		 status = mainService.checkCredentials(username,password,request);
 		 
 		 if(status){
 				
@@ -55,13 +57,14 @@ public class MainController {
 		 
 		
 	    }
+	 
+	 
+	 // to get tasks added by admin using admin id
 	 	
 	    @RequestMapping(value = "/tasklist", method = RequestMethod.GET)
-	    public String sayHelloAgain( HttpServletRequest httpServletRequest) {
+	    public String TasksList( HttpServletRequest httpServletRequest) {
 	    	String resp = null;
 	    	
-	        
-	        
 	        int userid=-1;
 	    	if(httpServletRequest.getSession().getAttribute("userid")!=null)
 	    	userid =(int) httpServletRequest.getSession().getAttribute("userid");
@@ -74,8 +77,32 @@ public class MainController {
 	    	resp=mainService.getTaskDetails(userid);  	
 	        return resp;
 	        
-	        
 	    }
+	    
+	    //for Searching the task ID
+	    @RequestMapping(value ="/searchtask", method = RequestMethod.POST)
+	    public String searchtask(@RequestBody HashMap<String,String> requestPayload, HttpServletRequest httpServletRequest) {
+	    	String resp="";
+	    	String id =  requestPayload.get("taskid");
+	    	  	
+	    	int userid=-1;
+	    	if(httpServletRequest.getSession().getAttribute("userid")!=null)
+	    	userid =(int) httpServletRequest.getSession().getAttribute("userid");
+	    	
+	    	if(userid==-1){
+	    		
+	    		return ErrorMessages.getErrormsg("0", "timeout");
+	    		
+	    	}
+	    	resp = mainService.getTaskById(id,userid);
+			return resp;
+	   
+	    }
+	    
+	    
+	    
+	    
+	    // To get all users Tagged by the Admin
 	    
 	    @RequestMapping(value = "/taggeditems", method = RequestMethod.GET)
 	    public String ajaxUrl( HttpServletRequest httpServletRequest) {
@@ -113,32 +140,16 @@ public class MainController {
 	    		
 	    	}
 	    	resp = mainService.savetask(name,fromdate,todate,description,userid);
+	    	if(resp.equals("-1")){
+	    		return ErrorMessages.getErrormsg("0","Not saved");
+	    	}
 			return ErrorMessages.getErrormsg("1", "Success");
 	    	
 	    	
 	       
 	    }
 	    
-	    //for Searching the task ID
-	    @RequestMapping(value ="/searchid", method = RequestMethod.POST)
-	    public String searchtask(@RequestBody HashMap<String,String> requestPayload, HttpServletRequest httpServletRequest) {
-	    	String resp="";
-	    	String id = (String) requestPayload.get("id");
-	    	  	
-	    	int userid=-1;
-	    	if(httpServletRequest.getSession().getAttribute("userid")!=null)
-	    	userid =(int) httpServletRequest.getSession().getAttribute("userid");
-	    	
-	    	if(userid==-1){
-	    		
-	    		return ErrorMessages.getErrormsg("0", "timeout");
-	    		
-	    	}
-	    	resp = mainService.getTaskById(id,userid);
-			return ErrorMessages.getErrormsg("1", "Success");
 	   
-	    }
-	    
 	    
 	    
 	    
@@ -151,12 +162,11 @@ public class MainController {
 	    	userid =(int) httpServletRequest.getSession().getAttribute("userid");
 	    	
 	    	if(userid==-1){
-	    		
 	    		return ErrorMessages.getErrormsg("0", "timeout");
 	    		
 	    	}
 	    	resp = mainService.getTaggedjobs(userid);
-			return ErrorMessages.getErrormsg("1", "Success");
+			return resp;
 	   
 	    }
 	    

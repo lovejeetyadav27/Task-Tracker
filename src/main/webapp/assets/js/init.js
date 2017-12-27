@@ -4,16 +4,18 @@
 var ProductsApp = (function() {
    
 	
-	//var productsData = [];
+	var renderList = [];
 	var tasksList = [];
+	var tasksaddedbyadminlist=[];
 	var taggedItemsData = [];
+	var totalusers =[];
 	var username=[];
     var cart = [];
     
     var printTasks = function() {
-        //do something.
+        // do something.
         const cards = [];
-        tasksList.forEach(function(task, index) {
+        tasksaddedbyadminlist.forEach(function(task, index) {
             cards.push(
                 '<div class="col s12 m12"><div class="card" data-id="'+ task.id +'">'+
                 '<div class="card-content"><span class="card-title">' +
@@ -29,9 +31,49 @@ var ProductsApp = (function() {
     }
     return {
     	
+    	searchtaskidauto : function(){
+
+    		
+       	 $('#entertaskid').change(function(e) {
+                e.preventDefault();
+                console.log($('#entertaskid').val());
+                if($('#entertaskid').val()){
+               
+                	 var data = {
+                             'taskid': $('#entertaskid').val()
+                       };
+                	 $.ajax({
+                         url: 'searchtask',
+                         type: 'POST',
+                         dataType: 'json',
+                         contentType: "application/json",
+                         data: JSON.stringify(data),
+                         success: function(res) {
+                         	var item = (res);
+                         	$('#entertaskid').val("");
+                            
+                            tasksaddedbyadminlist=[];
+                            
+                            tasksaddedbyadminlist = res.listofitem;
+                            if(tasksaddedbyadminlist==""){
+                            	alert("NO TASK FOUND");
+                            }else
+                            printTasks();
+                         },
+                         error: function(XMLHttpRequest, textStatus, errorThrown) {
+                             response = "err--" + XMLHttpRequest.status + " -- " + XMLHttpRequest.statusText;
+                             alert("NO TASK FOUND");
+                         }
+                     });
+                         
+                 }
+                })
+    		
+    		
+    		
+    	},
     
     	getintaggedjobs : function() {
-    		
     		
     		 $.ajax({
                  url: 'taggedinjobs',
@@ -53,7 +95,7 @@ var ProductsApp = (function() {
                     	 
                     	 
                      })
-                     $('#tahtask').html(tagjobs);
+                     $('#tagtaskid').html(tagjobs);
                      
                      
                     
@@ -78,7 +120,7 @@ var ProductsApp = (function() {
                       	window.location.href = '/testProject';
                       }
                      
-                     tasksList = data.listofitem;
+                     tasksaddedbyadminlist = data.listofitem;
                      printTasks();
                      
                     
@@ -97,7 +139,8 @@ var ProductsApp = (function() {
         		success: function(res){
         			var data = JSON.parse(res);
         			taggedItemsData = data.taggedItems;
-        			username = data.username;
+        			totalusers = data.totalusers;
+        			
         		},
         		error: function(XMLHttpRequest, textStatus, errorThrown) {
                     response = "err--" + XMLHttpRequest.status + " -- " + XMLHttpRequest.statusText;
@@ -114,8 +157,10 @@ var ProductsApp = (function() {
                  
                  console.log($(this).data('id'));
                  const id = $(this).data('id');
-                 var renderList = [];
+                 
                  var taggedList = [];
+                 var useroptionlist=[];
+                 
                  taggedItemsData.forEach(function(ele){
                 	 console.log(ele.taskid);
                 	 if(ele.taskid == id){
@@ -126,24 +171,71 @@ var ProductsApp = (function() {
                  
                  $('#summary-wrapper').html('');
                  
-                 $.each(username, function(val, text) {
-                	 $('#summary-wrapper').append(
-                	        $('<option></option>').val(val).html(text)
-                	    );
-                	});
+                 renderList=[];
+                 
+                 tasksaddedbyadminlist.forEach(function(task, index) {
+                	 
+                	 if(task.id==id){
+                		 renderList.push('<div class="col s12 m12"><div class="card" data-id="'+ task.id +'">'+
+                         '<div class="card-content"><span class="card-title">' +
+                         task.name + '</span><p>' +
+                         task.description + '</p><p>From -&nbsp;' +
+                         task.fromdate + '</p><p>To&nbsp;&nbsp;&nbsp;&nbsp;-&nbsp;' +
+                         task.todate + '</p ></div>'+
+                         '<div class="card-action addBtn' + 
+                         task.id + '"><a class="btn-floating btn-large waves-effect waves-light pink lighten-1  addBtn" data-id="' + task.id + '" data-todate="' + task.todate +'" data-fromdate="' + task.fromdate +'"><i class="material-icons">add</i></a><a class="pulse pink-text" style="float: right;font-size: 3rem;" href="javascript:void(0)">' +
+                         task.id + '</a></div></div></div>');
+                 
+                	 }
+                	 $('#summary-wrapper').html(renderList);
+                 
+                 });
+                 
+                 var listofitems=[];
+                 
+                 totalusers.forEach(function(user,index){
+                	 listofitems.push(  '<li name="'+ user.name+'" value="'+ user.name+'" data-id="'+ user.id+'">'+ user.name+' <button class="addtolist-btn"> ADD Item </button></li>');
+                	 
+                	 
+                 });
+                 
+                 
+                 
+                 renderList.push('<div class="col s12 m12"><div class="card" >'+
+                         '<div class="card-content"> '+
+                		 '<ul>'+
+                		listofitems + 
+                 '</ul>'+
+                 '</div>'+
+                 '</div></div>'); 
+                 
+                 
+                 
+                 
+                 
                  
                  taggedList.forEach(function(ele){
-                	renderList.push(
-                			'<div class="card card-inverse card-info mb-3 text-center"><div class="card-block"><blockquote class="card-blockquote"><p>'+ ele.name + '</p></blockquote></div></div>'); 
+                	renderList.push('<div class="col s12 m12"><div class="card" >'+
+                            '<div class="card-content"><span class="card-title">' +
+                            ele + '</span></div>'+
+                            '</div></div>'); 
                  });
                  
                  $('#summary-wrapper').html(renderList);
+                 $('#userslist').html(listofitems);
         	});
         },
    
         
       
-      
+      //tag the user for task
+        tagUser : function() {
+        	console.log('kaisa');
+        	$('body').on('click', '.addtolist-btn', function(e){
+        		e.preventDefault();
+        		console.log($(this).data('id'));
+        	});	
+        },
         
         saveTask : function(){
         	 $('.savetask').click(function(e) {
@@ -161,7 +253,6 @@ var ProductsApp = (function() {
                          type: 'POST',
                          dataType: 'json',
                          contentType: "application/json",
-                         async:false,
                          data: JSON.stringify(data),
                          success: function(res) {
                          	var item = (res);
@@ -172,6 +263,8 @@ var ProductsApp = (function() {
                             if(res.status == 0){
                             	window.location.href = '/testProject';
                             }
+                            console.log("data success part of saving");
+                            ProductsApp.getProducts();
                          },
                          error: function(XMLHttpRequest, textStatus, errorThrown) {
                              response = "err--" + XMLHttpRequest.status + " -- " + XMLHttpRequest.statusText;
@@ -191,13 +284,13 @@ var ProductsApp = (function() {
         	
         }
     }
-    //returning the object.
+    // returning the object.
 })();
 
+ProductsApp.searchtaskidauto();
 ProductsApp.getProducts();
 ProductsApp.getTaggedItems();
-
-
 ProductsApp.printTaggedItems();
-
+ProductsApp.getintaggedjobs();
 ProductsApp.saveTask();
+ProductsApp.tagUser();
